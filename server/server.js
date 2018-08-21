@@ -1,80 +1,35 @@
-const mongoose = require('mongoose');
+const express=require('express');
+const bodyParser= require('body-parser');
 
-//wich promise library we use ES6
-mongoose.Promise = global.Promise;
+const {mongoose}=require('./db/mongoose.js');
+const {Todo} =require('./models/todo.js');
+const {User} =require('./models/user.js');
 
-// Connection URL
-const url = 'mongodb://localhost:27017/TodoApp';
+const port=process.env.PORT||3000;
+let app=express();
 
-mongoose.connect(url);
+//configure middleware 
+app.use(bodyParser.json());
 
-//create mongoose model so that mongoose know how to store our data
-let Todo = mongoose.model('Todo', {
-    text: {
-        type: String,
-        required: true,
-        minLength: 1,
-        trim: true
-    },
-    completed: {
-        type: Boolean,
-        default: false
-    },
-    completedAt: {
-        type: Number,
-        default: null
-    }
+//set up a route passing our url and a callback. URL is important /todo is for creating 
+app.post('/todos',(req,res)=>{
+    //for test on postman only
+    // console.log(req.body);
+    let todo=new Todo({
+        text:req.body.text
+    });
+    //saving to the database
+    todo.save()
+    .then((doc)=>{
+        //send back the response
+        res.send(doc);
+    })
+    .catch((e)=>res.status(400).send(e));
 });
 
-//create new instance of the model
-// let newTodo = new Todo({ text: '  Learn to Spanish   ' });
 
-// //saving the new Todo
-// newTodo.save()
-//     .then((doc) => {
-//         console.log("Save Todo ", doc);
-//     }).catch((e) => {
-//         console.log('Unable to save Todo ', e);
-//     });
-
-// let otherTodo = new Todo({
-//     text: 'Learn MERN stack',
-//     completed: true,
-//     completedAt: 12345
-// })
-
-// otherTodo.save()
-//     .then((doc) => {
-//         console.log("Saved ", doc);
-//     })
-//     .catch((e) => {
-//         console.log(e);
-//     });
-
-let User = mongoose.model('User', {
-    email: {
-        type: String,
-        minLength: 5,
-        trim: true,
-        required: true
-    }
-});
-
-// let newUser = new User({
-//     email: 'As@k.com'
-// });
-
-// newUser.save()
-//     .then((doc) => {
-//         console.log(doc);
-//     }).catch((e) => {
-//         console.log(e);
-//     })
-
-// let checkUser = new User({ email: '' });
-// checkUser.save()
-//     .then((doc) => {
-//         console.log(doc);
-//     }).catch((e) => {
-//         console.log(e);
-//     });
+if(!module.parent){ 
+    app.listen(port,()=>{
+        console.log(port);
+    });
+}
