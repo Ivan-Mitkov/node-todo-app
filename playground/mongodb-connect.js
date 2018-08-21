@@ -26,17 +26,17 @@ MongoClient.connect(url, (err, client) => {
 
 
     // Insert a single document
-    db.collection('Users').insertOne({
-        name: "Ivan",
-        age: 41,
-        location: 'Sofia'
-    }, (err, result) => {
-        if (err) {
-            return console.log(" Unable to insert user ", err);
-        }
-        console.log(JSON.stringify(result.ops, undefined, 2));
-        console.log(result.ops[0]._id.getTimestamp());
-    })
+    // db.collection('Users').insertOne({
+    //     name: "Ivan",
+    //     age: 41,
+    //     location: 'Sofia'
+    // }, (err, result) => {
+    //     if (err) {
+    //         return console.log(" Unable to insert user ", err);
+    //     }
+    //     console.log(JSON.stringify(result.ops, undefined, 2));
+    //     console.log(result.ops[0]._id.getTimestamp());
+    // })
 
     client.close();
 })
