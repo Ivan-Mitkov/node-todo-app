@@ -1,6 +1,6 @@
 const { mongoose } = require('./../server/db/mongoose');
 const { Todo } = require('./../server/models/todo');
-const {ObgectId} =require('mongodb');
+const {ObjectId} =require('mongodb');
 
 let id = "5b7cf0952c9c47237432a967";
 
