@@ -33,3 +33,5 @@ if(!module.parent){
         console.log(port);
     });
 }
+
+module.exports={app}
