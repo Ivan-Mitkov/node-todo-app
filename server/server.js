@@ -34,7 +34,7 @@ app.get('/todos',(req,res)=>{
     })
     .catch((e)=>{
         res.status(400).send(e);
-    })
+    });
 })
 
 if (!module.parent) {
