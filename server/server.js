@@ -41,12 +41,12 @@ app.get('/todos', (req, res) => {
 app.get('/todos/:id', (req, res) => {
     let id = req.params.id;
     if (!ObjectId.isValid(id)) {
-        return res.sendStatus(400);
+        return res.sendStatus(404);
     }
     Todo.findById(id)
         .then((todo) => {
             if (!todo) {
-                return res.sendStatus(400);
+                return res.sendStatus(404);
             }
             res.send({ todo })
         })
