@@ -74,27 +74,31 @@ app.delete('/todos/:id', (req, res) => {
 });
 app.patch('/todos/:id', (req, res) => {
     let id = req.params.id;
-    //pick only existing properties otherwise it can be send not existing
-    
+  
+    //pick only existing properties otherwise it can be send not existing   
     let body = _.pick(req.body, ['text', 'completed']);
-    // console.log(body);
+    
     if (!ObjectId.isValid(id)) {
         return res.sendStatus(404);
     }
     if (_.isBoolean(body.completed) && body.completed) {
         //set timestamp
         body.completedAt = new Date().getTime();
+       
     }
     else {
         body.completed = false;
         body.completedAt = null;
+       
     }
-
+   
     Todo.findByIdAndUpdate(id, { $set: body }, { new: true })
         .then((todo) => {
             if (!todo) {
+                
                 return res.sendStatus(404);
             }
+            
             res.send({ todo });
         })
         .catch((e) => {
