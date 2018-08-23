@@ -7,11 +7,11 @@ const { Todo } = require('./../models/todo.js');
 
 const todos = [
     {
-        _id:new ObjectID(),
+        _id: new ObjectID(),
         text: "First todo"
     },
     {
-        _id:new ObjectID(),
+        _id: new ObjectID(),
         text: "Second test todo"
     }
 ];
@@ -89,19 +89,58 @@ describe('GET/todos/:id', () => {
             .end(done);
     });
 
-    it('should return 404 if todo not found',(done)=>{
+    it('should return 404 if todo not found', (done) => {
         let id = new ObjectID();
         request(app)
-        .get(`/todos/${id.toHexString()}`)
-        .expect(404)
-        .end(done)
+            .get(`/todos/${id.toHexString()}`)
+            .expect(404)
+            .end(done)
     });
-    it('should return 404 for non object id',(done)=>{
+    it('should return 404 for non object id', (done) => {
         let id = 123;
         request(app)
-        .get(`/todos/${id}`)
-        .expect(404)
-        .end(done)
+            .get(`/todos/${id}`)
+            .expect(404)
+            .end(done)
     });
 
+});
+
+describe('DELETE/todo/id', () => {
+    it('should remove a tod', (done) => {
+        let hexId = todos[1]._id.toHexString();
+        request(app)
+            .delete(`/todos/${hexId}`)
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo._id).toBe(hexId);
+            })
+            .end((err, res) => {
+                if (err) {
+                    return done(err);
+                }
+                // console.log(res);
+                Todo.findById({ _id: hexId })
+                    .then((todo) => {
+                        expect(todo).toNotExist;
+                        done();
+                    })
+                    .catch((e) => done(e));
+                //    done();
+            })
+    });
+    it('should return 404 if id not found', (done) => {
+        let id = new ObjectID();
+        request(app)
+            .delete(`/todos/${id.toHexString()}`)
+            .expect(404)
+            .end(done)
+    });
+    it('should return 404 if id is not valid', (done) => {
+        let id = 123;
+        request(app)
+            .get(`/todos/${id}`)
+            .expect(404)
+            .end(done)
+    });
 });
