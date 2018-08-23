@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { ObjectId } = require('mongodb');
+const _ = require('lodash');
 
 const { mongoose } = require('./db/mongoose.js');
 const { Todo } = require('./models/todo.js');
@@ -55,22 +56,52 @@ app.get('/todos/:id', (req, res) => {
             // console.log(e);
         });
 });
-app.delete('/todos/:id',(req,res)=>{
+app.delete('/todos/:id', (req, res) => {
     let id = req.params.id;
-    if(!ObjectId.isValid(id)){
+    if (!ObjectId.isValid(id)) {
         return res.sendStatus(404);
     }
-    Todo.findByIdAndRemove(id).then((todo)=>{
-        if(!todo){
+    Todo.findByIdAndRemove(id).then((todo) => {
+        if (!todo) {
             return res.sendStatus(404);
         }
         // res.sendStatus(200);
-        res.send({todo});
+        res.send({ todo });
     }).catch((e) => {
         res.sendStatus(400).send(e);
         // console.log(e);
     });
-})
+});
+app.patch('/todos/:id', (req, res) => {
+    let id = req.params.id;
+    //pick only existing properties otherwise it can be send not existing
+    
+    let body = _.pick(req.body, ['text', 'completed']);
+    // console.log(body);
+    if (!ObjectId.isValid(id)) {
+        return res.sendStatus(404);
+    }
+    if (_.isBoolean(body.completed) && body.completed) {
+        //set timestamp
+        body.completedAt = new Date().getTime();
+    }
+    else {
+        body.completed = false;
+        body.completedAt = null;
+    }
+
+    Todo.findByIdAndUpdate(id, { $set: body }, { new: true })
+        .then((todo) => {
+            if (!todo) {
+                return res.sendStatus(404);
+            }
+            res.send({ todo });
+        })
+        .catch((e) => {
+            res.sendStatus(400);
+        })
+
+});
 
 if (!module.parent) {
     app.listen(port, () => {
